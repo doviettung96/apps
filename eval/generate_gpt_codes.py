@@ -169,13 +169,19 @@ def main(args):
         try:
             with torch.no_grad():
                 input_ids = torch.LongTensor(tokenizer.encode(prompt_text, verbose=False)).unsqueeze(0).cuda()
-                output_ids = model.generate(
-                    input_ids,
-                    num_beams=args.num_beams,
-                    early_stopping=True,
-                    max_length=1024 - len(input_ids)
-                )
-                output_str = tokenizer.decode(output_ids[0])
+                print(input_ids.shape)
+                assert len(input_ids) == 1
+
+                if input_ids.shape[1] < 1024:
+                    output_ids = model.generate(
+                        input_ids,
+                        num_beams=args.num_beams,
+                        early_stopping=True,
+                        max_length=1024
+                    )
+                    output_str = tokenizer.decode(output_ids[0])
+                else:
+                    output_str = ""
         except Exception as e:
             if isinstance(e, UnboundLocalError) and str(e) == "local variable 'next_tokens' referenced before assignment":
                 # See https://github.com/huggingface/transformers/issues/5118
@@ -187,6 +193,7 @@ def main(args):
                 print(e)
             # Default to empty string on errors
             output_str = ""
+
         end = time.time()
 
         if args.peeking == 1.0:
