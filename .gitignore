@@ -1,4 +1,10 @@
 # Project specific ignores
 APPS.tar.gz
 apps_dataset/*
+data
+models
+out
 
+*.pyc
+
+*.vscode
